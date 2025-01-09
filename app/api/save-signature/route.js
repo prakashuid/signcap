@@ -17,21 +17,23 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-export async function POST(request) {
-  try {
-    const { signature, capturedImage, capturedAt } = await request.json();
-
-    // Firebase addDoc operation
-    await addDoc(collection(db, "item"), {
-        signature,
-        capturedImage,
-        capturedAt,
-    });
-
-    return NextResponse.json({ message: 'Signature saved successfully' });
-  } catch (error) {
-    console.error('Error saving signature:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+export async function POST(req) {
+  console.log(req)
+    try {
+      const data = await req.json();
+  
+      await addDoc(collection(db, "signatures"), {
+        data
+      });
+  
+      return new Response(JSON.stringify({ message: 'Signature saved successfully' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: 'Failed to save signature' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
   }
-}
-

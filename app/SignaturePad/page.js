@@ -96,14 +96,13 @@ export default function SignaturePad() {
     const capImage = captureImage();
 
     const newSignature = {
-      id: Date.now(),
       image: imageData,
       capturedAt: new Date().toISOString(),
       capImage,
     };
 
     try {
-      const response = await fetch('https://signcap.vercel.app/api/save-image', {
+      const response = await fetch('/api/save-signature', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
