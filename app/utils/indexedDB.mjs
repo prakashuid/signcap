@@ -56,7 +56,6 @@ export function openDatabase() {
   }
   
   export function addSignature(db, signatureData) {
-    console.log(db, signatureData)
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(['myObjectStore'], 'readwrite');
       const objectStore = transaction.objectStore('myObjectStore');

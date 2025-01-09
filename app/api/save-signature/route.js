@@ -18,7 +18,6 @@ const db = getFirestore(app);
 
 
 export async function POST(req) {
-  console.log(req)
     try {
       const data = await req.json();
   

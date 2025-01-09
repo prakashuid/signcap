@@ -111,7 +111,6 @@ export default function SignaturePad() {
       });
 
       if (response.ok) {
-        console.log('Uploaded to server');
         sigCanvas.current.clear();
       } else {
         console.error('Failed to upload signature');
