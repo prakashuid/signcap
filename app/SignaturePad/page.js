@@ -4,7 +4,6 @@ import React, { useRef, useState, useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { Button, Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Switch } from "@nextui-org/react";
 import confetti from 'canvas-confetti';
-import { toBlob } from 'canvas-to-blob'; 
 
 export default function SignaturePad() {
   const videoRef = useRef(null);
