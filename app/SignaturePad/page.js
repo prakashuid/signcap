@@ -4,16 +4,21 @@ import React, { useRef, useState, useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { Button, Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Switch } from "@nextui-org/react";
 import confetti from 'canvas-confetti';
+import { toBlob } from 'canvas-to-blob'; 
 
 export default function SignaturePad() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const sigCanvas = useRef({});
+  const sigCanvas = useRef(null);
+
   const [camCapture, setCamCapture] = useState(true);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isSelected, setIsSelected] = useState(true);
   const [isSelectedSign,setIsSelectedSign] =useState(true);
+  const [isSignatureReady, setIsSignatureReady] = useState(false); // Track readiness
+
   let stream = useRef(null); // Use ref to hold the media stream
+
 
   const confettiDefaults = {
     spread: 360,
@@ -23,6 +28,12 @@ export default function SignaturePad() {
     startVelocity: 30,
     colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8']
   };
+
+  useEffect(() => {
+    if (sigCanvas.current) {
+      setIsSignatureReady(true);
+    }
+  }, [sigCanvas]); 
 
   useEffect(() => {
     if (isSelected) {
@@ -93,6 +104,7 @@ export default function SignaturePad() {
   const saveSignature = async () => {
     handleConfetti();
     const imageData = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
+
     const capImage = captureImage();
 
     const newSignature = {
@@ -119,6 +131,8 @@ export default function SignaturePad() {
       console.error('Error uploading signature:', error);
     }
   };
+
+
 
   return (
     <div>
