@@ -5,7 +5,7 @@ import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
 const app = express();
-const port = "https://signcap.vercel.app/";
+const port = "https://signcap.vercel.app";
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -67,5 +67,5 @@ app.get('/api/get-images', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at https://signcap.vercel.app/`);
 });
