@@ -103,7 +103,7 @@ export default function SignaturePad() {
     };
 
     try {
-      const response = await fetch('http://localhost:5001/api/save-image', {
+      const response = await fetch('https://signcap.vercel.app/api/save-image', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
