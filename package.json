@@ -6,7 +6,6 @@
     "lint": "next lint",
     "dev": "concurrently \"npm run next-dev\" ",
     "next-dev": "next dev",
-    "server": "node server.js",
     "build": "NODE_ENV=production next build",
     "start": "concurrently \"npm run next-start\" \"node server.mjs\"",
     "next-start": "next start"
