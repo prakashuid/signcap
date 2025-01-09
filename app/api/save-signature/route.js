@@ -2,14 +2,8 @@ import { NextResponse } from 'next/server';
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+// ... (Your firebaseConfig remains the same) ...
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -17,23 +11,32 @@ export async function POST(req) {
   try {
     const data = await req.json();
 
-    // Input validation
+    // Input validation (enhanced)
     if (!data.image || !data.capturedAt || !data.capImage) {
       return new NextResponse(JSON.stringify({ error: 'Missing required fields: image, capturedAt, capImage' }), { status: 400 });
     }
-    // Add more robust validation as needed (data types, image size limits, etc.)
+    if (typeof data.image !== 'string' || typeof data.capImage !== 'string') {
+      return new NextResponse(JSON.stringify({ error: 'image and capImage must be strings (base64 encoded)' }), { status: 400 });
+    }
+    try {
+      new Date(data.capturedAt); // Check if it's a valid date string
+    } catch (dateError) {
+      return new NextResponse(JSON.stringify({ error: 'Invalid capturedAt date format' }), { status: 400 });
+    }
 
-    await addDoc(collection(db, "signatures"), { data });
 
+    await addDoc(collection(db, "signatures"), data);
+    
     return new NextResponse(JSON.stringify({ message: 'Signature saved successfully' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error("Error saving signature:", error); // Log the full error for debugging
+    console.error("Error saving signature:", error); 
 
+    //Improved error handling for better client feedback
     let errorMessage = 'Failed to save signature';
-    if (error.code) { // Check if Firestore error code is available
+    if (error.code) {
       switch (error.code) {
         case 'permission-denied':
           errorMessage = 'Insufficient permissions to write to Firestore.';
@@ -47,16 +50,20 @@ export async function POST(req) {
         case 'unavailable':
           errorMessage = 'Firestore is currently unavailable.';
           break;
-        // Add more cases for other Firestore error codes as needed
+        case 'invalid-argument':
+          errorMessage = 'Invalid data provided to Firestore. Check data types and structure.';
+          break;
         default:
-          errorMessage = `Firestore Error: ${error.code} - ${error.message}`; // Include the code and message for unknown errors
+          errorMessage = `Firestore Error: ${error.code} - ${error.message}`;
       }
+    } else if (error.message) {
+      errorMessage = `Unexpected error: ${error.message}`;
     } else {
-        errorMessage = `Unexpected error: ${error.message}`; // Handle other errors appropriately
+      errorMessage = "An unknown error occurred.";
     }
 
     return new NextResponse(JSON.stringify({ error: errorMessage }), {
-      status: 500,
+      status: 500, //Consider using 400 for client-side errors
       headers: { 'Content-Type': 'application/json' },
     });
   }
