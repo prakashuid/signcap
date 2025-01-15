@@ -1,4 +1,4 @@
-import { upload } from '@vercel/blob';
+import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
@@ -20,7 +20,7 @@ export async function POST(request) {
     const capImageBlob = new Blob([capImage], { type: 'image/jpeg' });
 
     // Use upload to manage the upload process
-    const jsonResponse = await upload({
+    const jsonResponse = await put({
       body: [imageBlob, capImageBlob],  // Provide the body parameter as an array of Blobs
       onBeforeGenerateToken: async () => {
         // Authenticate and authorize users before generating the token
