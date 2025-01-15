@@ -147,16 +147,12 @@ export default function SignaturePad() {
     };
   
     try {
-      // Send a POST request to the server with the image data
       const response = await fetch('/api/file', {
         method: 'POST',
         body: JSON.stringify(newSignature),
       });
-  
-      console.log(response)
-      // Check if the request was successful
-      if (response.ok) {
-        sigCanvas.current.clear(); // Clear the canvas if successful
+        if (response.ok) {
+        sigCanvas.current.clear();
         console.log("Sacved successful ")
       } else {
         console.error('Failed to upload signature');
