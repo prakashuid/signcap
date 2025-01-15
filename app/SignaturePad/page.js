@@ -10,6 +10,7 @@ import {
   DrawerBody,
   DrawerFooter,
   useDisclosure,
+  Image,
   Switch,
 } from "@nextui-org/react";
 import confetti from "canvas-confetti";
@@ -17,20 +18,13 @@ import confetti from "canvas-confetti";
 export default function SignaturePad() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const sigCanvas = useRef(null);
+  const sigCanvas = useRef();
 
   const [camCapture, setCamCapture] = useState(true);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isSelected, setIsSelected] = useState(true);
   const [isSelectedSign, setIsSelectedSign] = useState(true);
   const [isSignatureReady, setIsSignatureReady] = useState(false); // Track readiness
-  const [blobs, setBlobs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [signatureUrl, setSignatureUrl] = useState(null);
-  const [capImageUrl, setCapImageUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   let stream = useRef(null); // Use ref to hold the media stream
 
@@ -44,12 +38,6 @@ export default function SignaturePad() {
   };
 
   useEffect(() => {
-    if (sigCanvas.current) {
-      setIsSignatureReady(true);
-    }
-  }, [sigCanvas]);
-
-  useEffect(() => {
     if (isSelected) {
       startCamera();
     } else {
@@ -57,23 +45,14 @@ export default function SignaturePad() {
     }
   }, [isSelected]);
 
-  // const fetchBlobUrls = async () => {
-  //   try {
-  //     const response = await fetch('/api/file');
-  //     if (!response.ok) {
-  //       throw new Error('Failed to fetch blob URLs');
-  //     }
-  //     const data = await response.json();
-  //     setSignatureUrl(data.signatureUrl);
-  //     setCapImageUrl(data.capImageUrl);
-  //     setLoading(false);
-  //     console.log(data)
+  useEffect(() => {
+    if (sigCanvas.current) {
+      setIsSignatureReady(true);
+    }
+  }, [sigCanvas]);
 
-  //   } catch (err) {
-  //     setError(err.message);
-  //     setLoading(false);
-  //   }
-  // };
+  const signature =
+    "https://my-blob-store.public.blob.vercel-storage.com/signature-1633660730000-100000000.png";
 
   const startCamera = async () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -135,37 +114,6 @@ export default function SignaturePad() {
     });
   };
 
-  // const saveSignature = async () => {
-  //   handleConfetti();
-  //   const imageData = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
-
-  //   const capImage = captureImage();
-
-  //   const newSignature = {
-  //     image: imageData,
-  //     capturedAt: new Date().toISOString(),
-  //     capImage,
-  //   };
-
-  //   try {
-  //     const response = await fetch('/api/save-signature', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(newSignature),
-  //     });
-
-  //     if (response.ok) {
-  //       sigCanvas.current.clear();
-  //     } else {
-  //       console.error('Failed to upload signature');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error uploading signature:', error);
-  //   }
-  // };
-
   const saveSignature = async () => {
     handleConfetti();
 
@@ -188,8 +136,7 @@ export default function SignaturePad() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        // fetchBlobUrls();
+        await response.json();
         sigCanvas.current.clear();
       } else {
         console.error("Failed to upload signature");
@@ -199,55 +146,64 @@ export default function SignaturePad() {
     }
   };
 
+  const clearSignature = () => {
+    console.log("Clearing signature...");
+    if (sigCanvas.current) {
+      sigCanvas.current.clear();
+    } else {
+      console.error("Signature canvas is not initialized.");
+    }
+  };
+
   return (
     <div>
-      <div className="container flex flex-col">
-        <div className="flex flex-col items-center">
-          <div>
-            {camCapture && (
-              <div className="absolute left-72 ml-[6px] -mt-6">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  style={{ width: 200, height: 200 }}
-                />
-              </div>
-            )}
+      <div className="grid grid-cols-2 grid-rows-3 gap-4">
+        <div className="row-span-3 bg bg-gray-100 p-4 rounded-lg">
+          <Image src={signature} alt="signature" width={300} height={386} />
+        </div>
+        <div className="rounded-lg border border-gray-200 rounded-lg">
+          {camCapture && (
+            <video
+              ref={videoRef}
+              autoPlay
+              className=" w-3/4 justify-self-center"
+            />
+          )}
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+        </div>
+        <div className="row-span-2 col-start-2 row-start-2 bg bg-gray-100 p-4 rounded-lg">
+          {isSelectedSign && (
+            <SignatureCanvas
+              ref={sigCanvas}
+              canvasProps={{
+                width: 300,
+                height: 386,
+                className: "sigCanvas",
+              }}
+            />
+          )}
 
-            <canvas ref={canvasRef} style={{ display: "none" }} />
-
-            {isSelectedSign && (
-              <SignatureCanvas
-                ref={sigCanvas}
-                canvasProps={{
-                  width: 1024,
-                  height: 386,
-                  className: "sigCanvas",
-                }}
-              />
-            )}
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              color="secondary"
+              onPress={clearSignature}
+              className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+            >
+              Clear Signature
+            </Button>
+            <Button
+              type="button"
+              onPress={saveSignature}
+              className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+            >
+              Save Signature
+            </Button>
+            <Button onPress={onOpen}>Animation</Button>
           </div>
         </div>
-
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            color="secondary"
-            onClick={() => sigCanvas.current.clear()}
-            className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-          >
-            Clear Signature
-          </Button>
-          <Button
-            type="button"
-            onClick={saveSignature}
-            className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-          >
-            Save Signature
-          </Button>
-          <Button onPress={onOpen}>Animation</Button>
-        </div>
       </div>
+
       <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
         <DrawerContent>
           {(onClose) => (

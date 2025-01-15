@@ -34,15 +34,10 @@ export default function Home() {
 
   }
   return (
-    <div className="grid  items-center justify-items-center min-h-screen">
-   
-
-        <div className="grid grid-cols-3 gap-4">
-
-          <div className="col-span-1 bg-slate-200"></div>
-          <div className="col-span-2 bg-white"><SignaturePad setImageURL={setImageURL} /></div>
+    <div className="grid items-center  min-h-screen p-5">
+  
+         <SignaturePad setImageURL={setImageURL} />
         </div>
      
-    </div>
   );
 }
