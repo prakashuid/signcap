@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { upload } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
@@ -15,16 +15,19 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid input data' }, { status: 400 });
     }
 
+    // Convert image data to Blob or Buffer
+    const imageBlob = new Blob([image], { type: 'image/jpeg' });
+    const capImageBlob = new Blob([capImage], { type: 'image/jpeg' });
+
     // Use upload to manage the upload process
-    const jsonResponse = await put({
-      body: { image, capImage },  // Make sure to provide the body parameter
-      request,
-      onBeforeGenerateToken: async (pathname) => {
+    const jsonResponse = await upload({
+      body: [imageBlob, capImageBlob],  // Provide the body parameter as an array of Blobs
+      onBeforeGenerateToken: async () => {
         // Authenticate and authorize users before generating the token
         return {
           allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif'],
           tokenPayload: JSON.stringify({
-            capturedAt, // Include any additional information you need
+            // Include any additional information you need
           }),
         };
       },
