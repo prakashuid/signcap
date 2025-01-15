@@ -100,29 +100,64 @@ export default function SignaturePad() {
     });
   };
 
+  // const saveSignature = async () => {
+  //   handleConfetti();
+  //   const imageData = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
+
+  //   const capImage = captureImage();
+
+  //   const newSignature = {
+  //     image: imageData,
+  //     capturedAt: new Date().toISOString(),
+  //     capImage,
+  //   };
+
+  //   try {
+  //     const response = await fetch('/api/save-signature', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(newSignature),
+  //     });
+
+  //     if (response.ok) {
+  //       sigCanvas.current.clear();
+  //     } else {
+  //       console.error('Failed to upload signature');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error uploading signature:', error);
+  //   }
+  // };
+
   const saveSignature = async () => {
     handleConfetti();
-    const imageData = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
-
-    const capImage = captureImage();
+  
+    // Convert canvas image to base64, removing the data URL prefix
+    const imageData = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png").split(',')[1];
+    const capImage = captureImage().split(',')[1];
+  
+    // Create an object with the image data and timestamp
+    console.log(imageData, "DAGAETATATTAT", capImage)
 
     const newSignature = {
       image: imageData,
-      capturedAt: new Date().toISOString(),
-      capImage,
+      capImage: capImage
     };
-
+  
     try {
-      const response = await fetch('/api/save-signature', {
+      // Send a POST request to the server with the image data
+      const response = await fetch('/api/file', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(newSignature),
       });
-
+  
+      console.log(response)
+      // Check if the request was successful
       if (response.ok) {
-        sigCanvas.current.clear();
+        sigCanvas.current.clear(); // Clear the canvas if successful
+        console.log("Sacved successful ")
       } else {
         console.error('Failed to upload signature');
       }
@@ -130,8 +165,8 @@ export default function SignaturePad() {
       console.error('Error uploading signature:', error);
     }
   };
-
-
+  
+  
 
   return (
     <div>

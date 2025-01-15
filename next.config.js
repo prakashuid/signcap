@@ -5,6 +5,15 @@ const withPWA = require('next-pwa')({
   });
   
   const nextConfig = {
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'my-blob-store.public.blob.vercel-storage.com',
+          port: '',
+        },
+      ],
+    },
   };
   
   module.exports = withPWA(nextConfig);
