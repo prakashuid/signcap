@@ -5,13 +5,23 @@ export async function POST(req) {
   try {
     const body = await req.json();
     const { image, capImage } = body;
+
     const imageBuffer = Buffer.from(image, "base64");
     const capImageBuffer = Buffer.from(capImage, "base64");
-    const signatureResponse = await put("signature.png", imageBuffer, {
+
+    // Generate unique names using current timestamp and random numbers
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const signatureFilename = `signature-${uniqueSuffix}.png`;
+    const capturedFilename = `captured-${uniqueSuffix}.png`;
+
+    // Upload the signature image
+    const signatureResponse = await put(signatureFilename, imageBuffer, {
       contentType: "image/png",
       access: "public",
     });
-    const capImageResponse = await put("captured.png", capImageBuffer, {
+
+    // Upload the captured image
+    const capImageResponse = await put(capturedFilename, capImageBuffer, {
       contentType: "image/png",
       access: "public",
     });
@@ -25,7 +35,7 @@ export async function POST(req) {
   }
 }
 
-export async function GET(request) {
-  const { blobs } = await list();
-  return Response.json(blobs);
-}
+// export async function GET(request) {
+//   const { blobs } = await list();
+//   return Response.json(blobs);
+// }
