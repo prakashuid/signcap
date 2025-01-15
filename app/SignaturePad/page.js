@@ -15,6 +15,13 @@ export default function SignaturePad() {
   const [isSelected, setIsSelected] = useState(true);
   const [isSelectedSign,setIsSelectedSign] =useState(true);
   const [isSignatureReady, setIsSignatureReady] = useState(false); // Track readiness
+  const [blobs, setBlobs] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const [signatureUrl, setSignatureUrl] = useState(null);
+  const [capImageUrl, setCapImageUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   let stream = useRef(null); // Use ref to hold the media stream
 
@@ -41,6 +48,30 @@ export default function SignaturePad() {
       stopCamera();
     }
   }, [isSelected]);
+
+
+  const fetchBlobUrls = async () => {
+    try {
+      const response = await fetch('/api/file');
+      if (!response.ok) {
+        throw new Error('Failed to fetch blob URLs');
+      }
+      const data = await response.json();
+      setSignatureUrl(data.signatureUrl);
+      setCapImageUrl(data.capImageUrl);
+      setLoading(false);
+      console.log(data)
+
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+    // const response = await list();
+    // console.log("response get", response)
+  
+
+  };
+
 
   const startCamera = async () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -137,9 +168,6 @@ export default function SignaturePad() {
     // Convert canvas image to base64, removing the data URL prefix
     const imageData = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png").split(',')[1];
     const capImage = captureImage().split(',')[1];
-  
-    // Create an object with the image data and timestamp
-    console.log(imageData, "DAGAETATATTAT", capImage)
 
     const newSignature = {
       image: imageData,
@@ -151,9 +179,12 @@ export default function SignaturePad() {
         method: 'POST',
         body: JSON.stringify(newSignature),
       });
+
         if (response.ok) {
+            const data = await response.json();
+            console.log("Saved successful ", data)
+        fetchBlobUrls();
         sigCanvas.current.clear();
-        console.log("Sacved successful ")
       } else {
         console.error('Failed to upload signature');
       }
@@ -161,8 +192,7 @@ export default function SignaturePad() {
       console.error('Error uploading signature:', error);
     }
   };
-  
-  
+
 
   return (
     <div>
