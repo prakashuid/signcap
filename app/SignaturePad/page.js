@@ -176,7 +176,7 @@ export default function SignaturePad() {
           )}
           <canvas ref={canvasRef} style={{ display: "none" }} />
         </div>
-        <div className="row-span-2 col-start-2 row-start-2 bg bg-gray-100 p-4 rounded-lg">
+        <div className="row-span-2 col-start-2 row-start-2 bg bg-gray-100 p-4 rounded-lg z-10">
           {isSelectedSign && (
             <SignatureCanvas
               ref={sigCanvas}
