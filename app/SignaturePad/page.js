@@ -166,12 +166,12 @@ export default function SignaturePad() {
         <div className="row-span-3 bg bg-gray-100 p-4 rounded-lg">
           <Image src={signature} alt="signature" width={300} height={386} />
         </div>
-        <div className="rounded-lg border border-gray-200 rounded-lg">
+        <div className="rounded-lg border border-gray-200 rounded-lg " style={{ zIndex:"9999 !important" }}>``
           {camCapture && (
             <video
               ref={videoRef}
               autoPlay
-              className=" w-3/4 justify-self-center"
+              className="w-full h-full"
             />
           )}
           <canvas ref={canvasRef} style={{ display: "none" }} />
