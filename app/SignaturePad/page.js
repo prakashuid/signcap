@@ -43,6 +43,10 @@ export default function SignaturePad() {
     } else {
       stopCamera();
     }
+  
+    return () => {
+      stopCamera(); // Clean up on unmount
+    };
   }, [isSelected]);
 
   useEffect(() => {
@@ -67,6 +71,7 @@ export default function SignaturePad() {
       } catch (error) {
         console.error("Error accessing webcam:", error);
         alert(`Webcam error: ${error.message}`);
+        // You can add more detailed user feedback here
       }
     } else {
       console.error("getUserMedia is not supported on this browser.");

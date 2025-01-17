@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run next-dev\" ",
     "next-dev": "next dev",
     "build": "NODE_ENV=production next build",
-    "start": "concurrently \"npm run next-start\" \"node server.mjs\"",
+    "start": "concurrently \"npm run next-start\" ",
     "next-start": "next start"
   },
   "dependencies": {
