@@ -33,7 +33,29 @@ export default function Home() {
   };
   return (
     <div className="">
-      <SignaturePad setImageURL={setImageURL} />
+      <h1 className="text-center text-4xl font-bold">
+        App moved into below URLs
+      </h1>
+      <p>Please checkout New Design!</p>
+
+      <div className="flex justify-center">
+        <a
+          class="cta btn btn-primary shadow-sm"
+          id="Prakash"
+          href="https://signature-cap.vercel.app/"
+        >
+          {" "}
+          Capture the Image{" "}
+        </a>
+        <a
+          class="cta btn btn-primary shadow-sm"
+          id="Prakash"
+          href="https://show-sign.vercel.app/"
+        >
+          {" "}
+          Display the Image{" "}
+        </a>
+      </div>
     </div>
   );
 }
